@@ -44,6 +44,8 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Use `interface` for object-shaped public contracts such as Astro `Props`; keep annotations and formatting consistent with nearby TypeScript.
 - ESLint enforces explicit types at exported TypeScript module boundaries in `db/` and `src/lib/`.
 - Frontend code (TypeScript, Astro) must pass ESLint checks (`npm run lint`)
+- Every exported function should have a TSDoc comment describing its purpose, parameters, and return value.
+- Before imports or any code, add a comment block to the file that explains its purpose.
 
 ### Data Layer Patterns (Drizzle + Node SQLite)
 
