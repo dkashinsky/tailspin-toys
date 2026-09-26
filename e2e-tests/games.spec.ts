@@ -22,6 +22,30 @@ test.describe('Game Listing and Navigation', () => {
       await expect(gameCards.first().getByTestId('game-title')).toBeVisible();
       await expect(gameCards.first().getByTestId('game-title')).not.toBeEmpty();
     });
+
+    await test.step('Verify every game card shows its star rating', async () => {
+      const gameCards = page.getByTestId('game-card');
+      const gameCardCount = await gameCards.count();
+
+      await expect(page.getByTestId('game-card-rating')).toHaveCount(gameCardCount);
+
+      for (let index = 0; index < gameCardCount; index++) {
+        await expect(gameCards.nth(index).getByTestId('game-rating')).toContainText(/\d\.\d/);
+      }
+    });
+  });
+
+  test('should display fallback text for an unrated game card', async ({ page }) => {
+    await test.step('Navigate to the unrated game card fixture', async () => {
+      await page.goto('/test-fixtures/game-card-unrated');
+      await expect(page.getByTestId('unrated-game-card-fixture')).toBeVisible();
+    });
+
+    await test.step('Verify the unrated card shows the fallback text', async () => {
+      const gameCard = page.getByTestId('game-card');
+      await expect(gameCard.getByTestId('game-card-rating')).toContainText('No rating yet');
+      await expect(gameCard.getByTestId('game-rating')).toHaveCount(0);
+    });
   });
 
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {

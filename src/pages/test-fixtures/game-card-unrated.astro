@@ -1,0 +1,28 @@
+---
+import GameCard from '../../components/GameCard.astro';
+import Layout from '../../layouts/Layout.astro';
+import type { Game } from '../../types/game';
+
+export const prerender = true;
+
+const unratedGame: Game = {
+    id: 9999,
+    title: 'Fixture: Unrated Prototype',
+    description: 'A hard-coded fixture used to verify the unrated game-card fallback.',
+    publisher: {
+        id: 1,
+        name: 'Fixture Games',
+    },
+    category: {
+        id: 1,
+        name: 'Testing',
+    },
+    starRating: null,
+};
+---
+
+<Layout title="Unrated Game Card Fixture - Tailspin Toys">
+    <section class="max-w-sm" data-testid="unrated-game-card-fixture">
+        <GameCard game={unratedGame} />
+    </section>
+</Layout>
