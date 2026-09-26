@@ -91,6 +91,23 @@ test.describe('Accessibility Tests', () => {
         return page.locator('[data-testid="game-card"]:focus').count();
       }, { timeout: 15000, message: 'Expected a game card to receive focus via Tab' }).toBeGreaterThan(0);
     });
+
+  });
+
+  test('keyboard navigation - should be able to operate catalog filters', async ({ page }) => {
+    await page.goto('/');
+
+    const strategyFilter = page.getByRole('checkbox', { name: 'Strategy' });
+    const applyFilters = page.getByRole('button', { name: 'Apply filters' });
+
+    await strategyFilter.focus();
+    await page.keyboard.press('Space');
+    await expect(strategyFilter).toBeChecked();
+
+    await applyFilters.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('filter-results-status')).toHaveText('4 games shown');
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(4);
   });
 
   test('keyboard navigation - should be able to activate game card with Enter', async ({ page }) => {

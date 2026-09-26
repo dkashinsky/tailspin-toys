@@ -35,6 +35,82 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should apply and clear category and publisher filters', async ({ page }) => {
+    await page.goto('/');
+
+    const gameCards = page.getByTestId('game-card');
+    const visibleGameCards = page.locator('[data-testid="game-card"]:visible');
+    const applyFilters = page.getByRole('button', { name: 'Apply filters' });
+    const initialCount = await gameCards.count();
+
+    await test.step('Select a category without applying it', async () => {
+      await page.getByRole('checkbox', { name: 'Strategy' }).check();
+      await expect(visibleGameCards).toHaveCount(initialCount);
+    });
+
+    await test.step('Apply one category', async () => {
+      await applyFilters.click();
+      await expect(visibleGameCards).toHaveCount(4);
+      await expect(page.getByTestId('filter-results-status')).toHaveText('4 games shown');
+      await expect(visibleGameCards.getByTestId('game-category')).toHaveText([
+        'Strategy',
+        'Strategy',
+        'Strategy',
+        'Strategy',
+      ]);
+    });
+
+    await test.step('Apply multiple categories using match-any behavior', async () => {
+      await page.getByRole('checkbox', { name: 'Puzzle' }).check();
+      await applyFilters.click();
+      await expect(visibleGameCards).toHaveCount(8);
+      await expect(page.getByTestId('filter-results-status')).toHaveText('8 games shown');
+    });
+
+    await test.step('Combine categories with a publisher', async () => {
+      await page.getByLabel('Publisher').selectOption({ label: 'CodeForge Studios' });
+      await applyFilters.click();
+      await expect(visibleGameCards).toHaveCount(2);
+      await expect(page.getByTestId('filter-results-status')).toHaveText('2 games shown');
+      await expect(visibleGameCards.getByTestId('game-publisher')).toHaveText([
+        'CodeForge Studios',
+        'CodeForge Studios',
+      ]);
+    });
+
+    await test.step('Clear all filters and restore the catalog', async () => {
+      await page.getByRole('button', { name: 'Clear filters' }).click();
+      await expect(visibleGameCards).toHaveCount(initialCount);
+      await expect(page.getByTestId('filter-results-status')).toHaveText(
+        `${initialCount} games shown`,
+      );
+      await expect(page.getByRole('checkbox', { name: 'Strategy' })).not.toBeChecked();
+      await expect(page.getByRole('checkbox', { name: 'Puzzle' })).not.toBeChecked();
+      await expect(page.getByLabel('Publisher')).toHaveValue('');
+    });
+  });
+
+  test('should show an empty state when no games match', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByTestId('publisher-filter').evaluate((select) => {
+      const option = document.createElement('option');
+      option.value = '999999';
+      option.textContent = 'Publisher without games';
+      select.append(option);
+    });
+    await page.getByLabel('Publisher').selectOption('999999');
+    await page.getByRole('button', { name: 'Apply filters' }).click();
+
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(0);
+    await expect(page.getByTestId('games-grid')).toBeHidden();
+    await expect(page.getByTestId('filtered-empty-state')).toBeVisible();
+    await expect(page.getByTestId('filtered-empty-state')).toContainText(
+      'No games match the selected filters.',
+    );
+    await expect(page.getByTestId('filter-results-status')).toHaveText('0 games shown');
+  });
+
   test('should display fallback text for an unrated game card', async ({ page }) => {
     await test.step('Navigate to the unrated game card fixture', async () => {
       await page.goto('/test-fixtures/game-card-unrated');
