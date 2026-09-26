@@ -9,6 +9,24 @@ applyTo: '**/*.astro'
 
 Astro handles everything in the UI: pages, layouts, components, routing, and content. The site is **fully prerendered** (`output: 'static'`) — there is no client-side UI framework and no separate API server. Pages read data **directly in frontmatter** at build time via the Drizzle/Node SQLite data-access helpers in `src/lib/`.
 
+### Component Props Documentation
+
+Document the `Props` interface for every reusable `.astro` component. Add a short TSDoc/JSDoc description to the interface and to each property, including optionality, meaningful defaults, and any constraints that callers need to know. Keep the contract focused on the public API rather than repeating implementation details.
+
+```astro
+---
+/** Props for the game card displayed in a game listing. */
+interface Props {
+  /** Game data rendered by this card. */
+  game: Game;
+  /** Whether to show the publisher details; defaults to true. */
+  showPublisher?: boolean;
+}
+---
+```
+
+Use TypeScript types for the component contract and keep comments focused on intent; do not add comments that simply narrate markup or expressions.
+
 ### Component Structure
 
 ```astro

@@ -51,6 +51,9 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 }
 ```
 
+- Add a TSDoc/JSDoc block to **every exported function** in `db/` and `src/lib/`. State the function's purpose and describe every parameter and the return value with `@param` and `@returns`.
+- For helpers that accept `db`, document that it is the injectable Drizzle database client, used with the production connection by pages and an in-memory database by tests.
+- Explain intent and non-obvious decisions in comments; do not repeat what the code already expresses. Keep comments accurate when changing the related code.
 - Always `order by` a stable column (title) so static builds are deterministic.
 - Map raw rows to the app-facing `Game`/`Publisher`/`Category` types in one place; don't leak Drizzle row shapes into components.
 - Keep ordering/lookup logic in `games.ts`, not in pages.
